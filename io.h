@@ -1,0 +1,1 @@
+char* loadFile(char* path);

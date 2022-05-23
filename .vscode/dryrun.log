@@ -1,0 +1,5 @@
+make ems --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/alexandreduarte/projects/SDL2/SE'
+emcc main.c init.c input.c draw.c io.c -s USE_SDL=2 -s USE_WEBGL2=1 -s FULL_ES3=1 -o test.html --preload-file ./assets -Werror
+make: Leaving directory '/home/alexandreduarte/projects/SDL2/SE'
+ 
