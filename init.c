@@ -1,6 +1,8 @@
 #include "io.h"
 #include "defs.h"
 #include "init.h"
+#include "spherical_harmonics.h"
+#include "matrix.h"
 
 #ifdef __EMSCRIPTEN__
 //TODO implement a 
@@ -54,6 +56,10 @@ void initSDL(App *app)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetSwapInterval(0);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
     app->glContext = SDL_GL_CreateContext(app->window);
 
@@ -68,7 +74,7 @@ void initSDL(App *app)
 
 }
 
-void initGL(void)
+void initGL(ObjectData* data)
 {
 
     printf("initGL call\n");
@@ -76,30 +82,31 @@ void initGL(void)
     char* vs = loadFile("assets/shaders/shader.vert");
     char* fs = loadFile("assets/shaders/shader.frag");
 
-    printf("Successful shader loading\n");
+    printf("Successful file loading\n");
 
     GLuint vshader = loadAndCompileShader(GL_VERTEX_SHADER, vs);
     GLuint fshader = loadAndCompileShader(GL_FRAGMENT_SHADER, fs);
 
     free(vs);
     free(fs);
+    printf("Successful shader loading\n");
+
+    computeSphericalHarmonic(data, 2, 2);
+
+    if (!data->indices_data) {
+        printf("id failed\n");
+    }
+
+    if (!data->vertex_data) {
+        printf("vd failed\n");
+    }
+
+    printf("%d %d\n", data->vertex_size, data->indices_size);
 
     GLuint program = linkShader(vshader, fshader);
     glUseProgram(program);
 
     GLuint VAO, VBO, EBO;
-
-
-    GLfloat vertices[] = 
-    {
-        0.0f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f
-    };
-
-    GLuint elem[] = {
-        0, 1, 2
-    };
 
 #ifdef __EMSCRIPTEN__
     glGenVertexArraysOES(1, &VAO);
@@ -116,16 +123,28 @@ void initGL(void)
 #endif
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    printf("Completed Gl initialization\n");
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*data->vertex_size, data->vertex_data, GL_STATIC_DRAW);
+    printf("Completed Gl initialization\n");
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elem), elem, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*data->indices_size, data->indices_data, GL_STATIC_DRAW);
+    printf("Completed Gl initialization\n");
 
     GLint posAttrib = glGetAttribLocation(program, "pos");
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(posAttrib);
+
+    Matrix4 matrix, matrix1, matrix2;
+    createRotationMatrix4X(&matrix1, 0.8f);
+    createRotationMatrix4Y(&matrix2, 1.8f);
+    createMatrix4(&matrix);
+    multMatrices(&matrix, 2, &matrix1, &matrix2);
+
+    glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, 0, matrix.elem);
     
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    printf("Completed Gl initialization\n");
 }
 
 GLuint loadAndCompileShader(GLenum shaderType, const char *sourceCode)

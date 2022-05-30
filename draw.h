@@ -1,1 +1,1 @@
-void draw(void);
+void draw(int);

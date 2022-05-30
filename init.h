@@ -21,8 +21,9 @@
 #ifndef _H_INIT_
 #define _H_INIT_
 
+
 void initSDL(App*);
-void initGL(void);
+void initGL(ObjectData*);
 
 GLuint loadAndCompileShader(GLenum shaderType, const char *sourceCode);
 GLuint linkShader(GLuint vertShaderID, GLuint fragShaderID);

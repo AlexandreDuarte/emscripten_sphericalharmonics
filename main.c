@@ -11,32 +11,33 @@
 
 App app;
 
-void mainLoop(void);
+void mainLoop(ObjectData* data);
 void stop(void);
 
 int main(int argc, char const *argv[]) {
 
-    printf("Main n\n");
     initSDL(&app);
-    initGL();
+
+    ObjectData data;
+    initGL(&data);
 
     glViewport(0, 0, app.width, app.height);
 
 #ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(mainLoop, 0, 1);
+    emscripten_set_main_loop_arg((void*)mainLoop, (void*)&data, 0, 1);
 #else
     while (!app.quit)
     {
-        mainLoop();
+        mainLoop(&data);
     }
 #endif
 
     return 0;
 }
 
-void mainLoop(void) {
+void mainLoop(ObjectData* data) {
     
-    draw();
+    draw(data->indices_size);
 
     SDL_GL_SwapWindow(app.window);
 
@@ -47,6 +48,8 @@ void mainLoop(void) {
 		switch (event.type)
 		{
 			case SDL_QUIT:
+                free(data->indices_data);
+                free(data->vertex_data);
 				stop();
 				break;
 			case SDL_WINDOWEVENT:

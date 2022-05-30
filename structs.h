@@ -11,4 +11,12 @@ typedef struct {
     int height;
 } App;
 
+
+typedef struct {
+    int vertex_size;
+    int indices_size;
+    float* vertex_data;
+    unsigned int* indices_data;
+} ObjectData;
+
 #endif

@@ -1,5 +1,5 @@
 #OBJS specifies which files to compile as part of the project
-OBJS = main.c init.c input.c draw.c io.c
+OBJS = main.c init.c input.c draw.c io.c math_utils.c spherical_harmonics.c matrix.c
 
 #CC specifies which compiler we're using
 CC = gcc
@@ -9,14 +9,14 @@ CC = gcc
 COMPILER_FLAGS = 
 
 #LINKER_FLAGS specifies the libraries we're linking against
-LINKER_FLAGS = -lSDL2 -lGLESv2
+LINKER_FLAGS = -lSDL2 -lGLESv2 -lm
 
 #OBJ_NAME specifies the name of our exectuable
 OBJ_NAME = test1
 
 #This is the target that compiles our executable
 default: $(OBJS)
-	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)
+	$(CC) $(OBJS) $(COMPILER_FLAGS) $(LINKER_FLAGS) -o $(OBJ_NAME)  -O3
 
 ems: $(OBJS)
 	emcc $(OBJS) -s USE_SDL=2 -s USE_WEBGL2=1 -s FULL_ES3=1 -o test.html --preload-file ./assets -Werror
