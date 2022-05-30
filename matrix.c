@@ -15,8 +15,6 @@ void createMatrix3(Matrix3* matrix) {
                            0,  0, 1} };
 }
 
-void createViewMatrix4(Matrix4*);
-
 void createRotationMatrix4X(Matrix4* matrix, float angle) {
     float x = cosf(angle);
     float y = sinf(angle);
