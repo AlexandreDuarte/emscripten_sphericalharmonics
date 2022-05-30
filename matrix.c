@@ -64,10 +64,10 @@ void createRotationMatrix3Z(Matrix3* matrix, float angle) {
 }
 
 void createTranslationMatrix4(Matrix4* matrix, float x, float y, float z) {
-    *matrix = (Matrix4) { {1, 0, 0, x,
-                           0, 1, 0, y,
-                           0, 0, 1, z,
-                           0, 0, 0, 1} };
+    *matrix = (Matrix4) { {1, 0, 0, 0,
+                           0, 1, 0, 0,
+                           0, 0, 1, 0,
+                           x, y, z, 1} };
 }
 
 void multMatrices(Matrix4* output, int n_args, ...) {
