@@ -1,5 +1,5 @@
 #include "structs.h"
 
-double computeLegendrePolinominal(double x, double y, int l, int m);
-void computeLegendrePolinominal2(double* result, double x, double y, int l, int m, double T);
+float computeLegendrePolinominal(float x, float y, int l, int m);
+void computeLegendrePolinominal2(float* result, float x, float y, int l, int m, float T);
 void computeSphericalHarmonic(ObjectData*, int l, int m);

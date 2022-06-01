@@ -18,17 +18,17 @@ int dfactorial(int n) {
     return result;
 }
 
-double factorialk(double alpha, int k)
+float factorialk(float alpha, int k)
 {
-    double result = 1.0f;
+    float result = 1.0f;
     for (int i = 0; i < k; i++)
     {
-        result *= (alpha - (double)i);
+        result *= (alpha - (float)i);
     }
     return result;
 }
 
-double binomialCombination(double n, int k)
+float binomialCombination(float n, int k)
 {
-    return factorialk(n, k) / (double)factorial(k);
+    return factorialk(n, k) / (float)factorial(k);
 }

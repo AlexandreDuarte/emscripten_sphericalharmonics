@@ -94,7 +94,7 @@ void initGL(ObjectData* data)
     free(fs);
     printf("Successful shader loading\n");
 
-    computeSphericalHarmonic(data, 3, 1);
+    computeSphericalHarmonic(data, 7, 1);
 
     if (!data->indices_data) {
         printf("id failed\n");
@@ -134,9 +134,9 @@ void initGL(ObjectData* data)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*data->indices_size, data->indices_data, GL_STATIC_DRAW);
     printf("Completed Gl initialization\n");
 
-    GLint posAttrib = glGetAttribLocation(program, "pos");
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
-    glEnableVertexAttribArray(posAttrib);
+    GLint pos1Attrib = glGetAttribLocation(program, "pos");
+    glVertexAttribPointer(pos1Attrib, 3, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
+    glEnableVertexAttribArray(pos1Attrib);
 
     GLint colorSwitchAttrib = glGetAttribLocation(program, "sC");
     glVertexAttribPointer(colorSwitchAttrib, 1, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(3*sizeof(float)));
