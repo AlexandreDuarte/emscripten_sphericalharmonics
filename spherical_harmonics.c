@@ -109,12 +109,12 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
     }
 
     // NORMALIZE
-    /*for (int i = 0; i < data->vertex_size/4; i++)
+    for (int i = 0; i < data->vertex_size/4; i++)
     {
         vd[4*i + 0] /= max_L;
         vd[4*i + 1] /= max_L;
         vd[4*i + 2] /= max_L;
-    }*/
+    }
 
     count = 0;
 

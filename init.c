@@ -142,12 +142,11 @@ void initGL(ObjectData* data)
     glVertexAttribPointer(colorSwitchAttrib, 1, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(colorSwitchAttrib);
 
-    Matrix4 matrix, matrix1, matrix2, matrix3;
+    Matrix4 matrix, matrix1, matrix2;
     createRotationMatrix4X(&matrix1, -1.8f);
     createRotationMatrix4Z(&matrix2, 1.0f);
-    createScalingMatrix4(&matrix3, 0.1f, 0.1f, 0.1f);
     createMatrix4(&matrix);
-    multMatrices(&matrix, 3, &matrix1, &matrix2, &matrix3);
+    multMatrices(&matrix, 2, &matrix1, &matrix2);
 
     glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, 0, matrix.elem);
     glUniform4f(glGetUniformLocation(program, "color1"), 0.9f, 0.9f, 0.9f, 1.0f);
