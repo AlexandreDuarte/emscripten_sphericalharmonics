@@ -68,6 +68,13 @@ void createTranslationMatrix4(Matrix4* matrix, float x, float y, float z) {
                            x, y, z, 1} };
 }
 
+void createScalingMatrix4(Matrix4* matrix, float x, float y, float z) {
+    *matrix = (Matrix4) { {x, 0, 0, 0,
+                           0, y, 0, 0,
+                           0, 0, z, 0,
+                           0, 0, 0, 1} };
+}
+
 void multMatrices(Matrix4* output, int n_args, ...) {
     
     va_list ap;

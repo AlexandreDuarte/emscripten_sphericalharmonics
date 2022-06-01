@@ -20,4 +20,5 @@ void createRotationMatrix3Y(Matrix3*, float);
 void createRotationMatrix3Z(Matrix3*, float);
 
 void createTranslationMatrix4(Matrix4*, float, float, float);
+void createScalingMatrix4(Matrix4*, float, float, float);
 void multMatrices(Matrix4*, int, ...);

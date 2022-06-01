@@ -1,5 +1,7 @@
-float factorial(float);
+int factorial(int);
 
-float factorialk(float, float);
+int dfactorial(int);
 
-float binomialCombination(float, float);
+double factorialk(double, int);
+
+double binomialCombination(double, int);

@@ -4,18 +4,40 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// Legendre Polinominals iterative aproximation
-void computeLegendrePolinominal(float *result, float x, float y, float l, float m, float T)
+// Legendre Polinominals recursive computation
+double computeLegendrePolinominal(double x, double y, int l, int m)
 {
-
-    *result = 0;
-
-    for (float k = m; k <= l; k++)
-    {
-        *result += powf(x, k - m) * (float)(factorial(k) * binomialCombination(l, k) * binomialCombination((float)(l + k - 1) / 2, l) / factorial(k - m));
+    if (l == m) {
+        return (1-2*l%2) * dfactorial(2*l - 1) * pow(y*y, m*0.5);
+    } 
+    if (l == m+1) {
+        return x*(2*l+1)*computeLegendrePolinominal(x, y, l, l);
     }
 
-    *result *= T * powf(y, m);
+    return ((2.0*l -1.0)*x*computeLegendrePolinominal(x, y, l-1, m) - (l-1+m)*computeLegendrePolinominal(x, y, l-2, m))/(l-m);
+
+
+
+/*
+    *result = 0;
+
+    for (int k = m; k <= l; k++)
+    {
+        *result += powf(x, 1.0f*(k - m)) * ((1.0f*factorial(k) / 1.0f*factorial(k - m)) * binomialCombination(1.0f*l, k) * binomialCombination((l + k - 1)*0.5f, l));
+    }
+
+    *result *= T * powf(y*y, 0.5f*m);*/
+}
+
+void computeLegendrePolinominal2(double* result, double x, double y, int l, int m, double T) {
+    *result = 0;
+
+    for (int k = l; k >= m; k--)
+    {
+        *result += binomialCombination(1.0*l, k) * binomialCombination((l + k - 1)*0.5, l) * 1.0*factorial(k) * pow(x, 1.0*(k - m)) / 1.0*factorial(k - m);
+    }
+
+    *result *= T * pow(1 - x*x, m*0.5);
 }
 
 void computeSphericalHarmonic(ObjectData *data, int l, int m)
@@ -24,10 +46,10 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
     int SIZE = 402;
     int SIZE2 = 201;
 
-    float T = powf((float)2, (float)l);
+    double T = pow(2.0, (double)l);
 
-    data->vertex_size = 6 * SIZE * SIZE;
-    data->indices_size = SIZE * SIZE * 4;
+    data->vertex_size = 2 * 4 * (SIZE+1) * (SIZE2+1);
+    data->indices_size = (SIZE) * (SIZE2) * 2;
 
     float *vd = malloc(sizeof(float) * data->vertex_size);
     if (!vd)
@@ -42,88 +64,71 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
     }
     data->indices_data = id;
 
-    float mm = m * (1 - 2 * (m < 0));
+    double step = (1.0 / SIZE2);
 
-    float step = (1.0f / (float)(SIZE2));
+    double x, y, p_x, L;
 
-    float x, y, p_x, L;
-
-    float max_L = 0.0f;
+    double max_L = 0.0;
 
     int count = 0;
 
     // CALCULATE harmonics in spherical coordinates
     for (int phi = 0; phi <= SIZE; phi++)
     {
-        p_x = cosf(mm*phi*step*M_PI);
-        for (int theta = 0; theta <= SIZE2; theta ++)
-        {
-            x = cosf(theta*step*M_PI);
-            y = sinf(theta*step*M_PI);
-
-            computeLegendrePolinominal(&L, x, y, (float)l, mm, T);
-
-            if (L > max_L)
-            {
-                max_L = L;
-            }
-
-            vd[3 * count] = L * p_x * y * sinf(phi*step*M_PI);
-            vd[3 * count + 1] = L * p_x * y * cosf(phi*step*M_PI);
-            vd[3 * count + 2] = L * p_x * x;
-
-            count++;
-        }
-    }
-
-    count = 0;
-
-    for (int phi = 0; phi <= SIZE; phi++)
-    {
-        p_x = cosf(mm*phi*step*M_PI);
+        p_x = 1.0;
         for (int theta = 0; theta <= SIZE2; theta++)
         {
-            x = cosf(theta*step*M_PI);
-            y = sinf(theta*step*M_PI);
+            x = cos(theta*step*M_PI);
+            y = sin(theta*step*M_PI);
 
-            computeLegendrePolinominal(&L, x, y, (float)l, mm, T);
+            computeLegendrePolinominal2(&L, x, y, l, abs(m), T);
 
-            if (L > max_L)
-            {
-                max_L = L;
+
+            if (L < 0) {
+                if (-L > max_L)
+                {
+                    max_L = -L;
+                }
+            } else {
+                if (L > max_L)
+                {
+                    max_L = L;
+                }
             }
 
-            vd[3 * count] = -L * p_x * y * sinf(phi*step*M_PI);
-            vd[3 * count + 1] = -L * p_x * y * cosf(phi*step*M_PI);
-            vd[3 * count + 2] = -L * p_x * x;
+            double amplitude = (1 - 2*((L * p_x)<0.0)) * (L * p_x);
+            
+
+            vd[4 * count] = (float) (amplitude* y * cos(((double)phi*step)*M_PI));
+            vd[4 * count + 1] = (float) (amplitude* y * sin(((double)phi*step)*M_PI));
+            vd[4 * count + 2] = (float) (amplitude * x);
+            vd[4 * count + 3] = (L*p_x*x<0.0)*1.0f;
 
             count++;
         }
     }
 
     // NORMALIZE
-    for (int i = 0; i < data->vertex_size; i++)
+    /*for (int i = 0; i < data->vertex_size/4; i++)
     {
-        vd[i] /= max_L;
-    }
+        vd[4*i + 0] /= max_L;
+        vd[4*i + 1] /= max_L;
+        vd[4*i + 2] /= max_L;
+    }*/
 
     count = 0;
-    unsigned int offset = 0;
 
     // BUILD POINTS SEQUENCE
-    for (int loop = 0; loop <= 1; loop++)
-    {
-        offset = count / 2;
         for (unsigned int k = 0; k < SIZE; k++)
         {
             for (unsigned int i = 0; i < SIZE2; i++)
             {
 
-                id[count] = offset + i + (k) * (SIZE2);
-                id[count + 1] = offset + i + (k + 1) * (SIZE2);
+                id[count] = i + (k) * (SIZE2);
+                id[count + 1] = i + (k + 1) * (SIZE2);
 
                 count += 2;
             }
         }
-    }
+
 }

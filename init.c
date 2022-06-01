@@ -60,6 +60,7 @@ void initSDL(App *app)
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
 
     app->glContext = SDL_GL_CreateContext(app->window);
 
@@ -79,6 +80,8 @@ void initGL(ObjectData* data)
 
     printf("initGL call\n");
 
+    glEnable(GL_DEPTH_TEST);
+
     char* vs = loadFile("assets/shaders/shader.vert");
     char* fs = loadFile("assets/shaders/shader.frag");
 
@@ -91,7 +94,7 @@ void initGL(ObjectData* data)
     free(fs);
     printf("Successful shader loading\n");
 
-    computeSphericalHarmonic(data, 2, 2);
+    computeSphericalHarmonic(data, 3, 1);
 
     if (!data->indices_data) {
         printf("id failed\n");
@@ -132,16 +135,23 @@ void initGL(ObjectData* data)
     printf("Completed Gl initialization\n");
 
     GLint posAttrib = glGetAttribLocation(program, "pos");
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
     glEnableVertexAttribArray(posAttrib);
 
-    Matrix4 matrix, matrix1, matrix2;
-    createRotationMatrix4X(&matrix1, 0.8f);
-    createRotationMatrix4Y(&matrix2, 1.8f);
+    GLint colorSwitchAttrib = glGetAttribLocation(program, "sC");
+    glVertexAttribPointer(colorSwitchAttrib, 1, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(colorSwitchAttrib);
+
+    Matrix4 matrix, matrix1, matrix2, matrix3;
+    createRotationMatrix4X(&matrix1, -1.8f);
+    createRotationMatrix4Z(&matrix2, 1.0f);
+    createScalingMatrix4(&matrix3, 0.1f, 0.1f, 0.1f);
     createMatrix4(&matrix);
-    multMatrices(&matrix, 2, &matrix1, &matrix2);
+    multMatrices(&matrix, 3, &matrix1, &matrix2, &matrix3);
 
     glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, 0, matrix.elem);
+    glUniform4f(glGetUniformLocation(program, "color1"), 0.9f, 0.9f, 0.9f, 1.0f);
+    glUniform4f(glGetUniformLocation(program, "color2"), 0.2f, 0.2f, 0.2f, 1.0f);
     
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     printf("Completed Gl initialization\n");
