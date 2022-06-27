@@ -25,6 +25,8 @@
 void initSDL(App*);
 void initGL(ObjectData*);
 
+void destroyGL(ObjectData*);
+
 GLuint loadAndCompileShader(GLenum shaderType, const char *sourceCode);
 GLuint linkShader(GLuint vertShaderID, GLuint fragShaderID);
 

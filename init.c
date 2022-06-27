@@ -5,7 +5,7 @@
 #include "matrix.h"
 
 #ifdef __EMSCRIPTEN__
-//TODO implement a 
+//TODO implement resizing and dynamic size (dependant on website)
 EM_JS(int, getWidth, (), {
     return 500;
   //return window.innerWidth*7/10;
@@ -60,7 +60,7 @@ void initSDL(App *app)
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
 
     app->glContext = SDL_GL_CreateContext(app->window);
 
@@ -81,6 +81,9 @@ void initGL(ObjectData* data)
     printf("initGL call\n");
 
     glEnable(GL_DEPTH_TEST);
+   /*glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
+    glEnable(GL_CULL_FACE);
 
     char* vs = loadFile("assets/shaders/shader.vert");
     char* fs = loadFile("assets/shaders/shader.frag");
@@ -94,7 +97,7 @@ void initGL(ObjectData* data)
     free(fs);
     printf("Successful shader loading\n");
 
-    computeSphericalHarmonic(data, 7, 1);
+    computeSphericalHarmonic(data, 4, 1);
 
     if (!data->indices_data) {
         printf("id failed\n");
@@ -103,8 +106,6 @@ void initGL(ObjectData* data)
     if (!data->vertex_data) {
         printf("vd failed\n");
     }
-
-    printf("%d %d\n", data->vertex_size, data->indices_size);
 
     GLuint program = linkShader(vshader, fshader);
     glUseProgram(program);
@@ -125,14 +126,15 @@ void initGL(ObjectData* data)
     glBindVertexArray(VAO);
 #endif
 
+    data->VAO = VAO;
+    data->VBO = VBO;
+    data->EBO = EBO;
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    printf("Completed Gl initialization\n");
     glBufferData(GL_ARRAY_BUFFER, sizeof(float)*data->vertex_size, data->vertex_data, GL_STATIC_DRAW);
-    printf("Completed Gl initialization\n");
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*data->indices_size, data->indices_data, GL_STATIC_DRAW);
-    printf("Completed Gl initialization\n");
 
     GLint pos1Attrib = glGetAttribLocation(program, "pos");
     glVertexAttribPointer(pos1Attrib, 3, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
@@ -144,16 +146,22 @@ void initGL(ObjectData* data)
 
     Matrix4 matrix, matrix1, matrix2;
     createRotationMatrix4X(&matrix1, -1.8f);
-    createRotationMatrix4Z(&matrix2, 1.0f);
+    createRotationMatrix4Z(&matrix2, M_PI - 0.5f);
     createMatrix4(&matrix);
     multMatrices(&matrix, 2, &matrix1, &matrix2);
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, 0, matrix.elem);
+    glUniformMatrix4fv(glGetUniformLocation(program, "mvp"), 1, GL_FALSE, matrix.elem);
     glUniform4f(glGetUniformLocation(program, "color1"), 0.9f, 0.9f, 0.9f, 1.0f);
     glUniform4f(glGetUniformLocation(program, "color2"), 0.2f, 0.2f, 0.2f, 1.0f);
     
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    printf("Completed Gl initialization\n");
+    printf("Completed gl allocation\n");
+}
+
+void destroyGL(ObjectData* data) {
+    glDeleteBuffers(1, &data->VBO);
+    glDeleteBuffers(1, &data->VAO);
+    glDeleteBuffers(1, &data->EBO);
 }
 
 GLuint loadAndCompileShader(GLenum shaderType, const char *sourceCode)

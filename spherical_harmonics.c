@@ -48,8 +48,8 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
 
     float T = powf(2.0l, (float)l);
 
-    data->vertex_size = 7 * (SIZE+1) * (SIZE2+1);
-    data->indices_size = (SIZE) * (SIZE2) * 2;
+    data->vertex_size = 4 * (SIZE+2) * (SIZE2+3);
+    data->indices_size = (SIZE+2) * (SIZE2 + 3) * 2;
 
     float *vd = malloc(sizeof(float) * data->vertex_size);
     if (!vd)
@@ -73,9 +73,9 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
     int count = 0;
 
     // CALCULATE harmonics in spherical coordinates
-    for (int phi = -SIZE2+1; phi <= SIZE2; phi++)
+    for (int phi = 0; phi <= SIZE + 1; phi++)
     {
-        p_x = 1.0f;//cosf(m*phi*step*M_PI);
+        p_x = cosf(m*phi*step*M_PI);
         for (int theta = 0; theta <= SIZE2; theta++)
         {
             x = cosf(theta*step*M_PI);
@@ -103,10 +103,21 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
             vd[4 * count] = (float) (amplitude* y * cosf(phi*step*M_PI));
             vd[4 * count + 1] = (float) (amplitude* y * sinf(phi*step*M_PI));
             vd[4 * count + 2] = (float) (amplitude * x);
-            vd[4 * count + 3] = (L*p_x<0.0l)*1.0f;
+            vd[4 * count + 3] = (L*p_x<0.0f)*1.0f;
 
             count++;
         }
+        vd[4 * (count)] = vd[4 * (count - 1)];
+        vd[4 * (count) + 1] = vd[4 * (count - 1) + 1];
+        vd[4 * (count) + 2] = vd[4 * (count - 1) + 2];
+        vd[4 * (count) + 3] = vd[4 * (count - 1) + 3];
+
+        vd[4 * (count + 1)] = vd[4 * (count - 1)];
+        vd[4 * (count + 1) + 1] = vd[4 * (count - 1) + 1];
+        vd[4 * (count + 1) + 2] = vd[4 * (count - 1) + 2];
+        vd[4 * (count + 1) + 3] = vd[4 * (count - 1) + 3];
+
+        count+=2;
     }
 
     // NORMALIZE
@@ -121,13 +132,13 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
     count = 0;
 
     // BUILD POINTS SEQUENCE
-        for (unsigned int k = 0; k < SIZE; k++)
+        for (unsigned int k = 0; k < SIZE+1; k++)
         {
-            for (unsigned int i = 0; i < SIZE2; i++)
+            for (unsigned int i = 0; i <= SIZE2 + 3; i++)
             {
 
-                id[count] = i + (k) * (SIZE2);
-                id[count + 1] = i + (k + 1) * (SIZE2);
+                id[count] = i + (k) * (SIZE2 + 3);
+                id[count + 1] = i + (k + 1) * (SIZE2 + 3);
 
                 count += 2;
             }

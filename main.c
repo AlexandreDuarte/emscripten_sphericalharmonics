@@ -18,6 +18,8 @@ int main(int argc, char const *argv[]) {
 
     initSDL(&app);
 
+    
+
     ObjectData data;
     initGL(&data);
 

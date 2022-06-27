@@ -13,6 +13,7 @@ typedef struct {
 
 
 typedef struct {
+    unsigned int VBO, VAO, EBO;
     int vertex_size;
     int indices_size;
     float* vertex_data;
