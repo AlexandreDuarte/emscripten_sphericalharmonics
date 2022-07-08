@@ -1,3 +1,4 @@
 # emscripten_sphericalharmonics
 
-Spherical Harmonics renderer using the emscripten compile toolchain to WebAssembly
+Spherical Harmonics renderer in C, using the emscripten to compile to WebAssembly
+Non-WebAssembly version compiled to linux only
