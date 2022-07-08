@@ -50,8 +50,7 @@ void mainLoop(ObjectData* data) {
 		switch (event.type)
 		{
 			case SDL_QUIT:
-                free(data->indices_data);
-                free(data->vertex_data);
+                destroyGL(data);
 				stop();
 				break;
 			case SDL_WINDOWEVENT:

@@ -96,14 +96,12 @@ void computeSphericalHarmonic(ObjectData *data, int l, int m)
                     max_L = L;
                 }
             }
-
-            float amplitude = (1 - 2*((L * p_x)<0.0)) * (L * p_x);
             
 
-            vd[4 * count] = (float) (amplitude* y * cosf(phi*step*M_PI));
-            vd[4 * count + 1] = (float) (amplitude* y * sinf(phi*step*M_PI));
-            vd[4 * count + 2] = (float) (amplitude * x);
-            vd[4 * count + 3] = (L*p_x<0.0f)*1.0f;
+            vd[4 * count] = (float) (y * cosf(phi*step*M_PI));
+            vd[4 * count + 1] = (float) (y * sinf(phi*step*M_PI));
+            vd[4 * count + 2] = (float) (x);
+            vd[4 * count + 3] = L*p_x;
 
             count++;
         }

@@ -2,18 +2,11 @@
 
 precision highp float;
 
-uniform vec4 color1;
-uniform vec4 color2;
-
-in float switchColor;
+in vec4 switchColor;
 out vec4 color;
 
 void main() {
 
-    if(switchColor > 0.0f) {
-        color = color1;
-    } else {
-        color = color2;
-    }
+    color = switchColor;
 
 }

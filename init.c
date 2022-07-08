@@ -44,7 +44,7 @@ void initSDL(App *app)
     app->height = SCREEN_HEIGHT;
 #endif
 
-    app->window = SDL_CreateWindow("GL2", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, app->width, app->height, windowFlags);
+    app->window = SDL_CreateWindow("Spherical Harmonics", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, app->width, app->height, windowFlags);
 
     if (!app->window)
     {
@@ -140,7 +140,7 @@ void initGL(ObjectData* data)
     glVertexAttribPointer(pos1Attrib, 3, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
     glEnableVertexAttribArray(pos1Attrib);
 
-    GLint colorSwitchAttrib = glGetAttribLocation(program, "sC");
+    GLint colorSwitchAttrib = glGetAttribLocation(program, "amp");
     glVertexAttribPointer(colorSwitchAttrib, 1, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(colorSwitchAttrib);
 
@@ -162,6 +162,8 @@ void destroyGL(ObjectData* data) {
     glDeleteBuffers(1, &data->VBO);
     glDeleteBuffers(1, &data->VAO);
     glDeleteBuffers(1, &data->EBO);
+    free(data->indices_data);
+    free(data->vertex_data);
 }
 
 GLuint loadAndCompileShader(GLenum shaderType, const char *sourceCode)

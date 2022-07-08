@@ -38,8 +38,8 @@ var Module = typeof Module != 'undefined' ? Module : {};
         // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
-      var PACKAGE_NAME = 'test.data';
-      var REMOTE_PACKAGE_BASE = 'test.data';
+      var PACKAGE_NAME = './out/web/spherical_harmonics_wasm.data';
+      var REMOTE_PACKAGE_BASE = 'spherical_harmonics_wasm.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -173,10 +173,10 @@ Module['FS_createPath']("/assets", "shaders", true, true);
           var files = metadata['files'];
           for (var i = 0; i < files.length; ++i) {
             DataRequest.prototype.requests[files[i].filename].onload();
-          }          Module['removeRunDependency']('datafile_test.data');
+          }          Module['removeRunDependency']('datafile_./out/web/spherical_harmonics_wasm.data');
 
       };
-      Module['addRunDependency']('datafile_test.data');
+      Module['addRunDependency']('datafile_./out/web/spherical_harmonics_wasm.data');
 
       if (!Module.preloadResults) Module.preloadResults = {};
 
@@ -197,7 +197,7 @@ Module['FS_createPath']("/assets", "shaders", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/assets/shaders/shader.frag", "start": 0, "end": 236}, {"filename": "/assets/shaders/shader.vert", "start": 236, "end": 461}], "remote_package_size": 461, "package_uuid": "c7251272-5c78-4996-88df-a07509eea3bd"});
+    loadPackage({"files": [{"filename": "/assets/shaders/shader.frag", "start": 0, "end": 121}, {"filename": "/assets/shaders/shader.vert", "start": 121, "end": 599}], "remote_package_size": 599, "package_uuid": "6ca0552a-a80f-42b1-807a-a1c5324e3f9c"});
 
   })();
 
@@ -1709,7 +1709,7 @@ function createExportWrapper(name, fixedasm) {
 }
 
 var wasmBinaryFile;
-  wasmBinaryFile = 'test.wasm';
+  wasmBinaryFile = 'spherical_harmonics_wasm.wasm';
   if (!isDataURI(wasmBinaryFile)) {
     wasmBinaryFile = locateFile(wasmBinaryFile);
   }
@@ -9955,6 +9955,26 @@ function getWidth(){ return 500; }
       return id;
     }
 
+  function _glDeleteBuffers(n, buffers) {
+      for (var i = 0; i < n; i++) {
+        var id = HEAP32[(((buffers)+(i*4))>>2)];
+        var buffer = GL.buffers[id];
+  
+        // From spec: "glDeleteBuffers silently ignores 0's and names that do not
+        // correspond to existing buffer objects."
+        if (!buffer) continue;
+  
+        GLctx.deleteBuffer(buffer);
+        buffer.name = 0;
+        GL.buffers[id] = null;
+  
+        if (id == GLctx.currentArrayBufferBinding) GLctx.currentArrayBufferBinding = 0;
+        if (id == GLctx.currentElementArrayBufferBinding) GLctx.currentElementArrayBufferBinding = 0;
+        if (id == GLctx.currentPixelPackBufferBinding) GLctx.currentPixelPackBufferBinding = 0;
+        if (id == GLctx.currentPixelUnpackBufferBinding) GLctx.currentPixelUnpackBufferBinding = 0;
+      }
+    }
+
   function _glDeleteProgram(id) {
       if (!id) return;
       var program = GL.programs[id];
@@ -10925,6 +10945,7 @@ var asmLibraryArg = {
   "glCompileShader": _glCompileShader,
   "glCreateProgram": _glCreateProgram,
   "glCreateShader": _glCreateShader,
+  "glDeleteBuffers": _glDeleteBuffers,
   "glDeleteProgram": _glDeleteProgram,
   "glDeleteShader": _glDeleteShader,
   "glDrawElements": _glDrawElements,
