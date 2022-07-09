@@ -1,4 +1,4 @@
-# emscripten_sphericalharmonics
+# emscripten_sphericalharmonics (WIP)
 
 Spherical Harmonics renderer in C, using the emscripten to compile to WebAssembly.
 
